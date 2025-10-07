@@ -4,3 +4,21 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+env_logger = "0.11.8"
+futures-channel = "0.3.31"
+futures-util = "0.3.31"
+log = "0.4.28"
+tokio = { version = "1.47.1", features = ["io-std", "macros", "rt-multi-thread", "sync"] }
+tokio-stream = "0.1.17"
+tokio-tungstenite = "0.28.0"
+nipahblocks_api = { workspace = true }
+
+[workspace]
+members = [
+    ".",
+    "crates/nipahblocks_api",
+    "crates/nipahblocks_server",
+]
+
+[workspace.dependencies]
+nipahblocks_api = { path = "crates/nipahblocks_api" } 
