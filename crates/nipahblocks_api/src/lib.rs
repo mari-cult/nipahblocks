@@ -7,6 +7,10 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::chunk::{Chunk, ChunkId};
+
+pub mod chunk;
+
 #[derive(Error, Debug)]
 pub enum SerializeError {
     #[error("Encoding error: {0}")]
@@ -21,30 +25,11 @@ pub enum DeserializeError {
     NotBinary,
 }
 
-pub const CHUNK_WIDTH: usize = 16;
-pub const CHUNK_HEIGHT: usize = 256;
-pub const CHUNK_SIZE: usize = CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT;
-
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, Default)]
 pub struct Position {
     x: f32,
     y: f32,
     z: f32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Hash)]
-pub struct ChunkId {
-    x: i16,
-    y: i16,
-}
-
-impl From<Position> for ChunkId {
-    fn from(value: Position) -> Self {
-        ChunkId {
-            x: (value.x.floor() as i16 + CHUNK_WIDTH as i16 / 2) / CHUNK_WIDTH as i16,
-            y: (value.y.floor() as i16 + CHUNK_WIDTH as i16 / 2) / CHUNK_WIDTH as i16,
-        }
-    }
 }
 
 impl From<ChunkId> for Position {
@@ -72,17 +57,6 @@ pub struct ChatMessage {
     pub user_id: PlayerId,
     pub content: String,
     pub time: DateTime<Utc>,
-}
-
-pub type BlockId = u8;
-
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub struct Block(BlockId);
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Chunk {
-    id: ChunkId,
-    blocks: Vec<Block>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
