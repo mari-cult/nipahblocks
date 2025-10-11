@@ -11,10 +11,11 @@ pub struct ChunkId {
 
 impl ChunkId {
     fn starting_position(&self) -> Position {
+        let width = Chunk::WIDTH as f32;
         let half_width = Chunk::HALF_WIDTH as f32;
         Position {
-            x: self.x as f32 * 2.0 - half_width,
-            y: self.y as f32 * 2.0 - half_width,
+            x: self.x as f32 * width - half_width,
+            y: self.y as f32 * width - half_width,
             z: 0.0,
         }
     }
@@ -22,11 +23,11 @@ impl ChunkId {
 
 impl From<Position> for ChunkId {
     fn from(value: Position) -> Self {
-        let width = Chunk::WIDTH as i16;
-        let half_width = Chunk::HALF_WIDTH as i16;
+        let width = Chunk::WIDTH as f32;
+        let half_width = Chunk::HALF_WIDTH as f32;
         ChunkId {
-            x: (value.x.floor() as i16 + half_width) / width,
-            y: (value.y.floor() as i16 + half_width) / width,
+            x: ((value.x + half_width) / width).floor() as i16,
+            y: ((value.y + half_width) / width).floor() as i16,
         }
     }
 }
@@ -73,17 +74,17 @@ impl Chunk {
                     global_x as f64 * NOISE_FREQUENCY,
                     global_y as f64 * NOISE_FREQUENCY,
                 ]) as f32;
-                let noise_value = (noise_value + 2.0) / 2.0;
+                let noise_value = (noise_value + 1.0) / 2.0;
                 let height =
                     MIN_TERRAIN_HEIGHT + (noise_value * MAX_TERRAIN_AMPLITUDE).round() as usize;
-                (0..height).map(move |z| (x, y, z, MAX_TERRAIN_HEIGHT - height))
+                (0..height).map(move |z| (x, y, z, height - z))
             })
         {
             let index = Chunk::get_block_index(x, y, z);
             blocks[index] = Some(match depth {
                 0 => Block(3),
                 1..=3 => Block(2),
-                _ => Block(3),
+                _ => Block(1),
             })
         }
         Self {
