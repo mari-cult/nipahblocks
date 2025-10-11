@@ -21,7 +21,11 @@ pub enum DeserializeError {
     NotBinary,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub const CHUNK_WIDTH: usize = 16;
+pub const CHUNK_HEIGHT: usize = 256;
+pub const CHUNK_SIZE: usize = CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT;
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Default)]
 pub struct Position {
     x: f32,
     y: f32,
@@ -37,8 +41,8 @@ pub struct ChunkId {
 impl From<Position> for ChunkId {
     fn from(value: Position) -> Self {
         ChunkId {
-            x: value.x.round() as i16,
-            y: value.y.round() as i16,
+            x: (value.x.floor() as i16 + CHUNK_WIDTH as i16 / 2) / CHUNK_WIDTH as i16,
+            y: (value.y.floor() as i16 + CHUNK_WIDTH as i16 / 2) / CHUNK_WIDTH as i16,
         }
     }
 }
@@ -69,10 +73,6 @@ pub struct ChatMessage {
     pub content: String,
     pub time: DateTime<Utc>,
 }
-
-pub const CHUNK_WIDTH: usize = 16;
-pub const CHUNK_HEIGHT: usize = 256;
-pub const CHUNK_SIZE: usize = CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT;
 
 pub type BlockId = u8;
 
