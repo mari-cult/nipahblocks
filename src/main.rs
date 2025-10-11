@@ -50,6 +50,7 @@ async fn main() {
                         .await
                         .unwrap();
                 }
+                _ => (),
             }
         })
     };
